@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Modely Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        .hero-content {
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            animation: slideInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 35px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            animation: slideInUp 1s ease-out 0.6s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Products Section */
+        .products {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 60px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .product-item {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .product-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-item:hover::before {
+            opacity: 1;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image::before {
+            content: '🎨';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .order-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .order-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 100px 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .service-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .service-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .contact-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: #fff;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #ff6b6b;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">3D Modely Studio</div>
+            <ul class="nav-links">
+                <li><a href="#home">Domů</a></li>
+                <li><a href="#products">Produkty</a></li>
+                <li><a href="#services">Služby</a></li>
+                <li><a href="#contact">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Úžasné 3D Modely</h1>
+            <p>Přivedeme vaši představivost k životu s přesností a uměleckým cítěním</p>
+            <a href="#products" class="cta-button">Zobrazit Produkty</a>
+        </div>
+    </section>
+
+    <section id="products" class="products">
+        <div class="container">
+            <h2 class="section-title">Naše Produkty</h2>
+            <div class="products-grid">
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Píšťalka</span>
+                            <span class="product-price">10 Kč</span>
+                        </div>
+                        <p class="product-description">Kvalitní 3D tištěná píšťalka s jasným zvukem. Ideální pro sport, hry nebo jako dárek.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Lego Kostka</span>
+                            <span class="product-price">20 Kč</span>
+                        </div>
+                        <p class="product-description">Kompatibilní kostka s klasickým Lego designem. Perfektní pro rozšíření vaší stavebnice.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Raptor</span>
+                            <span class="product-price">50 Kč</span>
+                        </div>
+                        <p class="product-description">Detailní model dinosaura raptora. Skvělý pro sběratele nebo jako vzdělávací pomůcka.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Axolotl</span>
+                            <span class="product-price">70 Kč</span>
+                        </div>
+                        <p class="product-description">Roztomilý model axolotla s jemnými detaily. Populární mezi milovníky přírody.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Žába</span>
+                            <span class="product-price">60 Kč</span>
+                        </div>
+                        <p class="product-description">Realistický model žáby s autentickými detaily. Ideální pro výuku nebo dekoraci.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Chobotnička</span>
+                            <span class="product-price">30 Kč</span>
+                        </div>
+                        <p class="product-description">Elegantní model chobotnice s ohybnými chapadly. Fascinující mořský tvor.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Držák Na Klíče</span>
+                            <span class="product-price">35 Kč</span>
+                        </div>
+                        <p class="product-description">Praktický držák na klíče s moderním designem. Udržuje vaše klíče vždy na svém místě.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Stojánek na mobil</span>
+                            <span class="product-price">65 Kč</span>
+                        </div>
+                        <p class="product-description">Ergonomický stojánek pro mobilní telefony. Nastavitelný úhel pro pohodlné používání.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <div class="product-title">
+                            <span>Stojánek na ovladač</span>
+                            <span class="product-price">75 Kč</span>
+                        </div>
+                        <p class="product-description">Stylový stojánek pro herní ovladače. Udržuje váš ovladač organizovaný a snadno dostupný.</p>
+                        <button class="order-button">Objednat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Naše Služby</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <span class="service-icon">🎯</span>
+                    <h3 class="service-title">Vlastní 3D Modelování</h3>
+                    <p class="service-description">Přizpůsobené 3D modely navržené podle vašich specifických požadavků a představ.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🖨️</span>
+                    <h3 class="service-title">3D Tisk</h3>
+                    <p class="service-description">Profesionální služby 3D tisku s vysokou kvalitou a přesností pro všechny typy projektů.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🎨</span>
+                    <h3 class="service-title">Design a Konzultace</h3>
+                    <p class="service-description">Pomoc s designem a konzultace ohledně nejlepších řešení pro vaše projekty.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">⚡</span>
+                    <h3 class="service-title">Rychlé Prototypy</h3>
+                    <p class="service-description">Rychlé vytváření prototypů pro testování a vývoj vašich nápadů.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🔧</span>
+                    <h3 class="service-title">Opravy a Úpravy</h3>
+                    <p class="service-description">Opravy stávajících modelů a úpravy podle vašich potřeb.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">📦</span>
+                    <h3 class="service-title">Balení a Doprava</h3>
+                    <p class="service-description">Bezpečné balení a rychlá doprava všech objednaných produktů.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Kontaktujte Nás</h2>
+            <div class="contact-content">
+                <div>
+                    <h3 style="font-size: 2rem; margin-bottom: 20px;">Vytvořme Něco Úžasného</h3>
+                    <p style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px;">
+                        Jste připraveni přivést svou vizi k životu? Ať už se jedná o složitý architektonický model, 
+                        prototyp produktu nebo kreativní design postavy, jsme tu, abychom vám pomohli 
+                        dosáhnout úžasných výsledků.
+                    </p>
+                    <div style="margin-top: 40px;">
+                        <p style="margin-bottom: 15px;"><strong>📧 Email:</strong> info@3dmodely.cz</p>
+                        <p style="margin-bottom: 15px;"><strong>📞 Telefon:</strong> +420 123 456 789</p>
+                        <p style="margin-bottom: 15px;"><strong>🏢 Adresa:</strong> Kreativní ulice 123, Praha</p>
+                        <p style="margin-bottom: 15px;"><strong>⏰ Otevírací doba:</strong> Po-Pá 9:00-18:00</p>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Jméno</label>
+                        <input type="text" id="name" name="name" placeholder="Vaše jméno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="vas@email.cz" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefon</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+420 123 456 789">
+                    </div>
+                    <div class="form-group">
+                        <label for="product">Produkt</label>
+                        <input type="text" id="product" name="product" placeholder="např. Axolotl, Vlastní model">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Zpráva</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Popište nám váš projekt nebo dotaz..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Odeslat Zprávu</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">3D Modely Studio</div>
+                <p>&copy; 2025 3D Modely Studio. Všechna práva vyhrazena.</p>
+                <div class="social-links">
+                    <a href="#" title="Instagram">📷</a>
+                    <a href="#" title="Facebook">📘</a>
+                    <a href="#" title="Email">📧</a>
+                    <a href="#" title="WhatsApp">📱</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Order button functionality
+        document.querySelectorAll('.order-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const productTitle = this.closest('.product-item').querySelector('.product-title span').textContent;
+                const productPrice = this.closest('.product-item').querySelector('.product-price').textContent;
+                
+                // Scroll to contact form
+                document.querySelector('#contact').scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Pre-fill the product field
+                setTimeout(() => {
+                    document.querySelector('#product').value = productTitle + ' - ' + productPrice;
+                }, 1000);
+            });
+        });
+
+        // Form submission
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.querySelector('#name').value;
+            const email = document.querySelector('#email').value;
+            const phone = document.querySelector('#phone').value;
+            const product = document.querySelector('#product').value;
+            const message = document.querySelector('#message').value;
+            
+            alert(`Děkujeme za vaši objednávku, ${name}!\n\nVaše objednávka: ${product}\n\nBrzy vás kontaktujeme na ${email} nebo ${phone}.`);
+            this.reset();
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(0, 0, 0, 0.4)';
+            } else {
+                header.style.background = 'rgba(0, 0, 0, 0.2)';
+            }
+        });
+
+        // Animate product items on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.product-item, .service-card').forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(50px)';
+            item.style.transition = 'all 0.6s ease';
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html>
